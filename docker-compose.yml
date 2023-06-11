@@ -9,8 +9,7 @@ services:
       POSTGRES_USER: psu
       POSTGRES_DB: ukpostal
     volumes:
-      - ./data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./csv:/csv
+      - ./csv:/var/lib/postgresql/csv
     ports:
       - 5432:5432
