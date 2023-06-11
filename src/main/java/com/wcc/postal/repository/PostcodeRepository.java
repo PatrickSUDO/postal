@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostcodeRepository extends JpaRepository<Postcode, Long> {
 
-
+    Postcode findByPostcode(String postcode);
 }

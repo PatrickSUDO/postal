@@ -38,7 +38,7 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(authz -> authz
                         // Only users with the "USER" role can access "/updatePostcode"
-                        .requestMatchers("/updatePostcode").hasRole("USER")
+                        .requestMatchers("/**").hasRole("USER")
                         // All other requests are permitted without authentication.
                         .anyRequest().authenticated())
                 // Disabling httpBasic and formLogin as these are not needed for REST APIs.

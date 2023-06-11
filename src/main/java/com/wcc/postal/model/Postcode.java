@@ -15,12 +15,12 @@ public class Postcode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String postcode;
 
-    @Column(nullable = false)
+    @Column
     private Double latitude;
 
-    @Column(nullable = false)
+    @Column
     private Double longitude;
 }
