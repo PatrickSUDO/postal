@@ -19,8 +19,8 @@ public class Postcode {
     private String postcode;
 
     @Column
-    private Double latitude;
+    private Float latitude;
 
     @Column
-    private Double longitude;
+    private Float longitude;
 }

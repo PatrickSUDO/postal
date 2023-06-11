@@ -1,11 +1,16 @@
 package com.wcc.postal.service;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.repository.PostcodeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class PostcodeService {
+
+    private static final Logger log = LoggerFactory.getLogger(PostcodeService.class);
 
     private final PostcodeRepository postcodeRepository;
 
@@ -15,14 +20,18 @@ public class PostcodeService {
     }
 
     public Postcode getPostcode(String postcode) {
+        log.info("Fetching postcode information for {}", postcode);
         return postcodeRepository.findByPostcode(postcode);
     }
 
     public double calculateDistance(String postcode1, String postcode2) {
+        log.info("Calculating distance between {} and {}", postcode1, postcode2);
+
         Postcode loc1 = postcodeRepository.findByPostcode(postcode1);
         Postcode loc2 = postcodeRepository.findByPostcode(postcode2);
 
         if(loc1 == null || loc2 == null) {
+            log.error("Invalid postcode(s) provided.");
             throw new IllegalArgumentException("Invalid postcode(s) provided.");
         }
 
