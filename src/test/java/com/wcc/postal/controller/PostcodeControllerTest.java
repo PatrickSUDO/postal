@@ -1,63 +1,63 @@
 package com.wcc.postal.controller;
-
-import com.wcc.postal.dto.DistanceResponse;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.service.PostcodeService;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(PostcodeController.class)
+@ExtendWith(MockitoExtension.class)
 public class PostcodeControllerTest {
 
-    @InjectMocks
-    private PostcodeController postcodeController;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private PostcodeService postcodeService;
 
     @Test
-    public void testGetDistance() {
-        Postcode postcode1 = new Postcode(); // Add appropriate constructors
-        Postcode postcode2 = new Postcode(); // Add appropriate constructors
-        Mockito.when(postcodeService.getPostcode(any(String.class))).thenReturn(postcode1);
-        Mockito.when(postcodeService.calculateDistance(any(String.class), any(String.class))).thenReturn(123.45);
+    @WithMockUser(roles = "USER")
+    public void testGetDistance() throws Exception {
+        Postcode postcode1 = new Postcode();
+        postcode1.setPostcode("AB10 1XG");
+        postcode1.setLatitude(57.14415740966797f);
+        postcode1.setLongitude(-2.1148641109466553f);
 
-        ResponseEntity<DistanceResponse> response = postcodeController.getDistance("AB12 3CD", "EF45 6GH");
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(123.45, response.getBody().getDistance());
+        Postcode postcode2 = new Postcode();
+        postcode2.setPostcode("AB53 4PA");
+        postcode2.setLatitude(57.54204177856445f);
+        postcode2.setLongitude(-2.458717107772827f);
+
+        when(postcodeService.getPostcode(anyString())).thenReturn(postcode1, postcode2);
+        when(postcodeService.calculateDistance(anyString(), anyString())).thenReturn(5.202602188565955d);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/distance")
+                        .param("postcode1", "AB10 1XG")
+                        .param("postcode2", "AB53 4PA")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.distance").value(5.202602188565955f));
     }
 
     @Test
-    public void testGetDistanceWithInvalidPostcode1() {
-        ResponseEntity<DistanceResponse> response = postcodeController.getDistance("INVALID", "EF45 6GH");
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    @WithMockUser(roles = "USER")
+    public void testGetDistanceWithInvalidPostcode() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/distance")
+                        .param("postcode1", "AB10 1XG")
+                        .param("postcode2", "")
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(status().isBadRequest());
     }
-
-    @Test
-    public void testGetDistanceWithInvalidPostcode2() {
-        ResponseEntity<DistanceResponse> response = postcodeController.getDistance("AB12 3CD", "INVALID");
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    public void testGetDistanceWithNullPostcode1() {
-        ResponseEntity<DistanceResponse> response = postcodeController.getDistance(null, "EF45 6GH");
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
-    @Test
-    public void testGetDistanceWithNullPostcode2() {
-        ResponseEntity<DistanceResponse> response = postcodeController.getDistance("AB12 3CD", null);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
-
 }
 

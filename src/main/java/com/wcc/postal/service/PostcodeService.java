@@ -1,4 +1,5 @@
 package com.wcc.postal.service;
+import com.wcc.postal.exception.PostcodeNotFoundException;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.repository.PostcodeRepository;
 import org.slf4j.Logger;
@@ -21,7 +22,12 @@ public class PostcodeService {
 
     public Postcode getPostcode(String postcode) {
         log.info("Fetching postcode information for {}", postcode);
-        return postcodeRepository.findByPostcode(postcode);
+        Postcode result = postcodeRepository.findByPostcode(postcode);
+        if (result == null) {
+            log.error("Postcode '{}' not found", postcode);
+            throw new PostcodeNotFoundException("Postcode '" + postcode + "' not found");
+        }
+        return result;
     }
 
     public double calculateDistance(String postcode1, String postcode2) {
@@ -35,11 +41,17 @@ public class PostcodeService {
             throw new IllegalArgumentException("Invalid postcode(s) provided.");
         }
 
-        return calculateDistance(
-                loc1.getLatitude(),
-                loc1.getLongitude(),
-                loc2.getLatitude(),
-                loc2.getLongitude());
+        Float lat1 = loc1.getLatitude();
+        Float lon1 = loc1.getLongitude();
+        Float lat2 = loc2.getLatitude();
+        Float lon2 = loc2.getLongitude();
+
+        if(lat1 == null || lon1 == null || lat2 == null || lon2 == null) {
+            log.error("Missing latitude/longitude data.");
+            throw new IllegalArgumentException("Missing latitude/longitude data.");
+        }
+
+        return calculateDistance(lat1, lon1, lat2, lon2);
     }
 
     private static final double EARTH_RADIUS = 6371; // radius in kilometers

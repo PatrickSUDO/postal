@@ -1,6 +1,7 @@
 package com.wcc.postal.controller;
 
 import com.wcc.postal.dto.DistanceResponse;
+import com.wcc.postal.exception.PostcodeNotFoundException;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.service.PostcodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,12 @@ public class PostcodeController {
         log.error("Parameter '{}' is missing", name);
         // Return a friendly error message
         return String.format("Parameter '%s' is missing", name);
+    }
+
+    @ExceptionHandler(PostcodeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handlePostcodeNotFound(PostcodeNotFoundException ex) {
+        return ex.getMessage();
     }
 
 }
