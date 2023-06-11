@@ -1,4 +1,5 @@
 package com.wcc.postal.controller;
+import com.wcc.postal.PostcodeFixture;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.service.PostcodeService;
 import org.junit.jupiter.api.Test;
@@ -26,18 +27,13 @@ public class PostcodeControllerTest {
     @MockBean
     private PostcodeService postcodeService;
 
+    private Postcode postcode1;
+    private Postcode postcode2;
     @Test
     @WithMockUser(roles = "USER")
     public void testGetDistance() throws Exception {
-        Postcode postcode1 = new Postcode();
-        postcode1.setPostcode("AB10 1XG");
-        postcode1.setLatitude(57.14415740966797f);
-        postcode1.setLongitude(-2.1148641109466553f);
-
-        Postcode postcode2 = new Postcode();
-        postcode2.setPostcode("AB53 4PA");
-        postcode2.setLatitude(57.54204177856445f);
-        postcode2.setLongitude(-2.458717107772827f);
+        postcode1 = PostcodeFixture.getPostcode1();
+        postcode2 = PostcodeFixture.getPostcode2();
 
         when(postcodeService.getPostcode(anyString())).thenReturn(postcode1, postcode2);
         when(postcodeService.calculateDistance(anyString(), anyString())).thenReturn(5.202602188565955d);

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -19,6 +20,16 @@ public class PostcodeService {
     public PostcodeService(PostcodeRepository postcodeRepository) {
         this.postcodeRepository = postcodeRepository;
     }
+
+    @Transactional
+    public Postcode updatePostcode(String postcode, Float latitude, Float longitude) {
+        log.info("Updating coordinates for {}", postcode);
+        Postcode existingPostcode = getPostcode(postcode);
+        existingPostcode.setLatitude(latitude);
+        existingPostcode.setLongitude(longitude);
+        return postcodeRepository.save(existingPostcode);
+    }
+
 
     public Postcode getPostcode(String postcode) {
         log.info("Fetching postcode information for {}", postcode);

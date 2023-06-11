@@ -1,20 +1,22 @@
 package com.wcc.postal.service;
 
+import com.wcc.postal.PostcodeFixture;
 import com.wcc.postal.exception.PostcodeNotFoundException;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.repository.PostcodeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class PostcodeServiceTest {
 
     @Mock
@@ -28,15 +30,8 @@ public class PostcodeServiceTest {
 
     @BeforeEach
     public void setUp() {
-        postcode1 = new Postcode();
-        postcode1.setPostcode("AB10 1XG");
-        postcode1.setLatitude(57.14415740966797f);
-        postcode1.setLongitude(-2.1148641109466553f);
-
-        postcode2 = new Postcode();
-        postcode2.setPostcode("AB53 4PA");
-        postcode2.setLatitude(57.54204177856445f);
-        postcode2.setLongitude(-2.458717107772827f);
+        postcode1 = PostcodeFixture.getPostcode1();
+        postcode2 = PostcodeFixture.getPostcode2();
 
         given(postcodeRepository.findByPostcode("AB10 1XG")).willReturn(postcode1);
         given(postcodeRepository.findByPostcode("AB53 4PA")).willReturn(postcode2);
@@ -66,5 +61,15 @@ public class PostcodeServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             postcodeService.calculateDistance("AB10 1XG", "UNKNOWN"); // Unknown postcode
         });
+    }
+
+    @Test
+    public void testUpdatePostcode() {
+        given(postcodeRepository.save(any(Postcode.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+        Postcode result = postcodeService.updatePostcode("AB10 1XG", 58.0f, -3.0f);
+        assertEquals("AB10 1XG", result.getPostcode());
+        assertEquals(58.0f, result.getLatitude());
+        assertEquals(-3.0f, result.getLongitude());
     }
 }

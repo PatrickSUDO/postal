@@ -1,6 +1,7 @@
 package com.wcc.postal.controller;
 
 import com.wcc.postal.dto.DistanceResponse;
+import com.wcc.postal.dto.PostcodeUpdateRequest;
 import com.wcc.postal.exception.PostcodeNotFoundException;
 import com.wcc.postal.model.Postcode;
 import com.wcc.postal.service.PostcodeService;
@@ -39,11 +40,24 @@ public class PostcodeController {
         return new ResponseEntity<>(new DistanceResponse(p1, p2, distance), HttpStatus.OK);
     }
 
+    @PutMapping("/postcode")
+    @PreAuthorize("hasRole('ADMIN')") // Only authenticated users with role 'ADMIN' can access this endpoint
+    public ResponseEntity<Postcode> updatePostcode(@RequestBody PostcodeUpdateRequest updateRequest) {
+        if (!isValidPostcode(updateRequest.getPostcode())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        log.info("Updating coordinates for {}", updateRequest.getPostcode());
+        Postcode updatedPostcode = postcodeService.updatePostcode(updateRequest.getPostcode(), updateRequest.getLatitude(), updateRequest.getLongitude());
+        return new ResponseEntity<>(updatedPostcode, HttpStatus.OK);
+    }
+
     private boolean isValidPostcode(String postcode) {
         // Add your postcode validation logic here. This is a simple example.
         String postcodeRegex = "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$";
         return postcode.matches(postcodeRegex);
     }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleMissingParams(MissingServletRequestParameterException ex) {
