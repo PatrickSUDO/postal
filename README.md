@@ -1,21 +1,33 @@
-# Postal Service Application
-
-## Description
-This is a Spring Boot application for managing postal codes. You can fetch postal code information, calculate the distance between two postal codes, and update postal codes.
+# UK-Postal
 
 ## Prerequisites
-- Docker
-- Docker Compose
 
-## How to run the application
-1. Clone the repository: `git clone https://github.com/<your-github-account>/postal-service.git`
-2. Navigate to the project directory: `cd postal-service`
-3. Start the application: `docker-compose up app`
+- JDK 17
+- Maven
+- Docker 
 
-The application should now be running and accessible at `http://localhost:8080`.
+## Getting Started
 
-## How to run the tests
-1. Ensure you're in the project directory.
-2. Run the tests: `docker-compose up test`
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-The test results should be displayed in the console.
+### Running the PostgreSQL Database
+
+1. Start the PostgreSQL container using `docker-compose`:
+
+   ```shell
+   docker-compose up -d
+   ```
+
+2. Build and run the project using Maven:
+
+    ``` shell
+    ./mvnw spring-boot:run
+    ```
+
+
+3. Verify that the application is running by accessing the defined endpoints in your browser or using tools like cURL or Postman.
+
+    For example:
+    ```shell
+    curl -u user:password http://localhost:8080/distance\?postcode1\=AB10%201XG\&postcode2\=AB21%209DA -iL 
+    ```
