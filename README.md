@@ -29,5 +29,5 @@ These instructions will get you a copy of the project up and running on your loc
 
     For example:
     ```shell
-    curl -u user:password http://localhost:8080/distance\?postcode1\=AB10%201XG\&postcode2\=AB21%209DA -iL 
+    curl -u user:password http://localhost:8080/distance\?postcode1\=AB10%201XG\&postcode2\=AB21%209DA 
     ```
